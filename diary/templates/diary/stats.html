@@ -1,0 +1,42 @@
+{% extends "diary/base.html" %}
+{% load static %}
+
+{% block content %}
+<h2>Στατιστικά Διάθεσης</h2>
+
+<h3>📌 Μέσος όρος έντασης:</h3>
+<p>
+    {% if avg_score %}
+        <strong>{{ avg_score|floatformat:1 }}</strong> / 10
+    {% else %}
+        Δεν υπάρχουν ακόμη δεδομένα.
+    {% endif %}
+</p>
+
+<h3>📊 Συχνότητα συναισθημάτων</h3>
+<ul>
+    {% for item in mood_counts %}
+        <li><strong>{{ item.mood }}</strong>: {{ item.total }} φορές</li>
+    {% empty %}
+        <li>Δεν υπάρχουν ακόμη καταγραφές.</li>
+    {% endfor %}
+</ul>
+
+<h3>📜 Ιστορικό Καταγραφών</h3>
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Ημερομηνία</th>
+        <th>Συναίσθημα</th>
+        <th>Βαθμός</th>
+    </tr>
+
+    {% for entry in entries %}
+    <tr>
+        <td>{{ entry.date|date:"d/m/Y H:i" }}</td>
+        <td>{{ entry.mood }}</td>
+        <td>{{ entry.score }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

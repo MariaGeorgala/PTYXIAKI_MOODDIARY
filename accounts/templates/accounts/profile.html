@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="profile-card">
+
+    <h2>Το Προφίλ μου</h2>
+
+    {% if profile.profile_image %}
+        <img src="{{ profile.profile_image.url }}" class="profile-img">
+    {% else %}
+        <img src="{% static 'diary/default_pfp.png' %}" class="profile-img">
+    {% endif %}
+
+    <p><strong>Όνομα χρήστη:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Ημ/νία Γέννησης:</strong> {{ profile.Birth_Date|default:"—" }}</p>
+
+    <hr>
+
+    <div class="profile-links">
+        <a href="{% url 'history' %}" class="btn-link">📜 Ιστορικό Διαθέσεων</a>
+        <a href="{% url 'stats' %}" class="btn-link">📊 Στατιστικά Χρήστη</a>
+    </div>
+
+</div>
+
+<style>
+.profile-card{
+    width:450px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:16px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+    text-align:center;
+    font-family:Segoe UI;
+}
+.profile-img{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #ddd;
+    margin-bottom:20px;
+}
+.profile-links{
+    display:flex;
+    justify-content:space-around;
+    margin-top:20px;
+}
+.btn-link{
+    background:#6a85ff;
+    color:white;
+    padding:10px 16px;
+    border-radius:12px;
+    text-decoration:none;
+    font-size:14px;
+}
+.btn-link:hover{
+    background:#4f6bf5;
+}
+</style>
+{% endblock %}

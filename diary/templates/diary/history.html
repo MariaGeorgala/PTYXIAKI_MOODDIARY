@@ -1,0 +1,54 @@
+{% extends "diary/base.html" %}
+{% load static %}
+
+{% block title %}Ιστορικό Διάθεσης{% endblock %}
+
+{% block content %}
+<h2>Ιστορικό Καταγραφών</h2>
+
+<style>
+    .entry-box {
+        background: #e58282;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .entry-header {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .mood-tag {
+        padding: 4px 10px;
+        border-radius: 6px;
+        color: white;
+        display: inline-block;
+        margin-bottom: 5px;
+    }
+</style>
+
+{% if entries %}
+    {% for entry in entries %}
+        <div class="entry-box">
+            <div class="entry-header">
+                Ημερομηνία: {{ entry.created_at|date:"d/m/Y H:i" }}
+            </div>
+
+            <div>
+                <span class="mood-tag" style="background:#4a73ff;">
+                    {{ entry.mood }} - {{ entry.score }}
+                </span>
+            </div>
+
+            <p><strong>Απαντήσεις:</strong> {{ entry.response }}</p>
+
+            {% if entry.notes %}
+            <p><strong>Σημειώσεις:</strong> {{ entry.notes }}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Δεν υπάρχουν ακόμα καταγραφές.</p>
+{% endif %}
+
+{% endblock %}

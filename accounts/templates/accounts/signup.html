@@ -1,0 +1,46 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Εγγραφή Χρήστη</title>
+    <link rel="stylesheet" href="{% static 'diary/signup.css' %}">
+</head>
+
+<body>
+
+<div class="signup-box">
+
+    <h2>Sign Up</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Username -->
+        <label for="username">Όνομα χρήστη:</label>
+        {{ form.username }}
+
+        <!-- Email -->
+        <label for="email">Email:</label>
+        {{ form.email }}
+
+        <!-- Password -->
+        <label for="password">Password:</label>
+        {{ form.password }}
+
+        <!-- Confirm Password -->
+        <label for="confirm_password">Confirm password:</label>
+        {{ form.confirm_password }}
+
+        <!-- Birth Date -->
+        <label for="Birth_Date">Ημερομηνία Γέννησης:</label>
+        {{ form.Birth_Date }}
+
+        <button type="submit">Sign Up</button>
+    </form>
+
+</div>
+
+</body>
+</html>

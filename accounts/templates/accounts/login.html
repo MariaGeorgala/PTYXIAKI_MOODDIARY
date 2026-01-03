@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σύνδεση</title>
+
+    <style>
+        /* ====== LOGIN PAGE STYLING (FULL) ====== */
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .login-container {
+            width: 420px;
+            margin: 80px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+
+        /* TITLE */
+        h2 {
+            color: #333;
+            font-size: 34px;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        /* LABELS */
+        label {
+            display: block;
+            margin-top: 18px;
+            font-size: 18px;
+            color: #444;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        /* INPUTS */
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 16px;
+            margin-top: 8px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 18px;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #6a85ff;
+            box-shadow: 0 0 6px rgba(106,133,255,0.4);
+        }
+
+        /* BUTTON */
+        button {
+            width: 100%;
+            margin-top: 28px;
+            background: #6a85ff;
+            border: none;
+            color: white;
+            padding: 16px;
+            font-size: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #5068d9;
+        }
+
+        /* FORGOT + SIGNUP TEXT */
+        .signup-text,
+        .forgot-text {
+            margin-top: 20px;
+            font-size: 17px;
+        }
+
+        .signup-text a,
+        .forgot-text a {
+            color: #5068d9;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .signup-text a:hover,
+        .forgot-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* DARK MODE */
+        body.dark {
+            background: #1e1e1e;
+        }
+
+        body.dark .login-container {
+            background: #2c2c2c;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+        }
+
+        body.dark h2 {
+            color: #f0f0f0;
+        }
+
+        body.dark label {
+            color: #ddd;
+        }
+
+        body.dark input {
+            background: #3a3a3a;
+            border: 1px solid #555;
+            color: white;
+        }
+
+        body.dark button {
+            background: #8da1ff;
+        }
+
+        .dark-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 14px;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+        }
+
+        body.dark .dark-toggle {
+            background: #333;
+            color: white;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<button class="dark-toggle" onclick="toggleDarkMode()">Dark Mode</button>
+
+<div class="login-container">
+
+    <h2>Σύνδεση Χρήστη</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label for="username">Όνομα Χρήστη:</label>
+        <input type="text" name="username" required placeholder="Πληκτρολόγησε το όνομα">
+
+        <label for="password">Κωδικός:</label>
+        <input type="password" name="password" required placeholder="Πληκτρολόγησε τον κωδικό">
+
+        <button type="submit">Σύνδεση</button>
+    </form>
+
+    <p class="forgot-text">
+        <a href="{% url 'forgot_password' %}">Ξέχασες τον κωδικό σου;</a>
+    </p>
+
+    <p class="signup-text">
+        Δεν έχεις λογαριασμό; <a href="{% url 'signup' %}">Εγγραφή Χρήστη</a>
+    </p>
+
+</div>
+
+<script>
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark');
+    }
+</script>
+
+</body>
+</html>

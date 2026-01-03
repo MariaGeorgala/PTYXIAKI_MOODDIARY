@@ -1,0 +1,121 @@
+{% extends "diary/base.html" %}
+
+{% block content %}
+
+<div class="mood-card">
+    <div class="mood-header">
+        <h2>Ερώτηση {{ request.session.question_index|add:1 }} από 5</h2>
+        <p class="subtitle">Απάντησε με ηρεμία — δεν υπάρχει σωστό/λάθος 😊</p>
+    </div>
+
+    <div class="question-box">
+        <p class="question-text">{{ question }}</p>
+    </div>
+
+    {% if error %}
+        <div class="error-box">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" class="mood-form">
+        {% csrf_token %}
+        <label class="label">Η απάντησή σου:</label>
+        <textarea name="response" rows="5" required placeholder="Γράψε εδώ..." ></textarea>
+
+        <button type="submit" class="btn-next">Επόμενη</button>
+    </form>
+</div>
+
+<style>
+    .mood-card{
+        width: min(900px, 92%);
+        margin: 50px auto;
+        background: white;
+        padding: 35px;
+        border-radius: 18px;
+        box-shadow: 0 10px 26px rgba(0,0,0,0.12);
+        font-family: "Segoe UI", sans-serif;
+    }
+
+    .mood-header h2{
+        font-size: 34px;
+        margin-bottom: 8px;
+        color: #1f2a44;
+    }
+
+    .subtitle{
+        font-size: 18px;
+        color: #5a647a;
+        margin-top: 0;
+        margin-bottom: 22px;
+    }
+
+    .question-box{
+        background: linear-gradient(135deg, #6a85ff, #9bb8ff);
+        padding: 22px;
+        border-radius: 14px;
+        margin-bottom: 18px;
+    }
+
+    .question-text{
+        font-size: 24px;   /* ΜΕΓΑΛΑ ΓΡΑΜΜΑΤΑ */
+        color: white;
+        margin: 0;
+        font-weight: 700;
+        line-height: 1.35;
+    }
+
+    .label{
+        display: block;
+        font-size: 18px;
+        margin: 14px 0 10px;
+        color: #2c2c2c;
+        font-weight: 700;
+    }
+
+    textarea{
+        width: 100%;
+        font-size: 18px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #d9d9d9;
+        outline: none;
+        resize: vertical;
+        transition: 0.2s;
+        box-sizing: border-box;
+    }
+
+    textarea:focus{
+        border-color: #6a85ff;
+        box-shadow: 0 0 0 4px rgba(106,133,255,0.18);
+    }
+
+    .btn-next{
+        width: 100%;
+        margin-top: 18px;
+        background: #6a85ff;
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 14px;
+        font-size: 20px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-next:hover{
+        background: #5068d9;
+    }
+
+    .error-box{
+        background: #ffe3e3;
+        color: #8b1a1a;
+        padding: 12px 14px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+</style>
+
+{% endblock %}

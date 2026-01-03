@@ -1,0 +1,10 @@
+{% extends "diary/base.html" %}
+
+{% block content %}
+<h2>Αποτέλεσμα Ανάλυσης</h2>
+
+<p style="font-size: 24px;">{{ result }}</p>
+
+<a href="{% url 'log_mood' %}" class="btn">Νέα Αξιολόγηση</a>
+
+{% endblock %}
