@@ -14,14 +14,16 @@
     <style>
       body {
         background: #f7f7f7;
-        padding-top: 90px; /* χώρος ώστε να μη σκεπάζεται το περιεχόμενο από το navbar */
+        padding-top: 90px; /* για να μην κρύβεται το content από το navbar */
       }
+
       .navbar {
         position: fixed;
         top: 0;
         width: 100%;
         z-index: 999;
       }
+
       .container {
         max-width: 900px;
       }
@@ -29,28 +31,44 @@
   </head>
 
   <body>
+    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
       <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="{% url 'home' %}">🌸 MoodDiary</a>
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+          🌸 MoodDiary
+        </a>
 
         <div>
           {% if user.is_authenticated %}
-          <a class="btn btn-outline-light me-2" href="{% url 'log_mood' %}">
-            🧠 Καταγραφή
-          </a>
-          <a class="btn btn-outline-light me-2" href="{% url 'profile' %}">
-            👤 Προφίλ
-          </a>
-          <a class="btn btn-outline-danger" href="{% url 'logout' %}">
-            🚪 Αποσύνδεση
-          </a>
+
+            <a class="btn btn-outline-light me-2" href="{% url 'log_mood' %}">
+              🧠 Καταγραφή
+            </a>
+
+            {% if request.resolver_match.url_name != 'profile' %}
+              <a class="btn btn-outline-light me-2" href="{% url 'profile' %}">
+                👤 Προφίλ
+              </a>
+            {% endif %}
+
+            <a class="btn btn-outline-danger" href="{% url 'logout' %}">
+              🚪 Αποσύνδεση
+            </a>
+
           {% else %}
-          <a class="btn btn-success" href="{% url 'login' %}"> Σύνδεση </a>
+            <a class="btn btn-success" href="{% url 'login' %}">
+              Σύνδεση
+            </a>
           {% endif %}
         </div>
       </div>
     </nav>
 
-    <div class="container">{% block content %} {% endblock %}</div>
+    <!-- CONTENT -->
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+
   </body>
 </html>

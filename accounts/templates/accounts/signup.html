@@ -1,46 +1,243 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
     <title>Εγγραφή Χρήστη</title>
-    <link rel="stylesheet" href="{% static 'diary/signup.css' %}">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #e7c3d7, #c48aa3);
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .signup-box {
+            background: white;
+            width: 520px;
+            padding: 45px;
+            border-radius: 24px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #5a2a4a;
+            font-size: 34px;
+        }
+
+        label {
+            margin-top: 15px;
+            display: block;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #bbb;
+            margin-top: 6px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #9e4e79;
+            box-shadow: 0 0 10px rgba(158,78,121,0.35);
+            outline: none;
+        }
+
+        /* PASSWORD WRAPPER */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #777;
+        }
+
+        /* PASSWORD STRENGTH */
+        .strength-bar {
+            height: 8px;
+            border-radius: 10px;
+            margin-top: 8px;
+            background: #eee;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: 0.3s;
+        }
+
+        .weak { background: #e74c3c; width: 33%; }
+        .medium { background: #f1c40f; width: 66%; }
+        .strong { background: #2ecc71; width: 100%; }
+
+        /* RULES */
+        .rules {
+            font-size: 14px;
+            margin-top: 8px;
+            color: #777;
+        }
+
+        .rules span.valid {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        /* MATCH CHECK */
+        .match-status {
+            font-size: 15px;
+            margin-top: 6px;
+        }
+
+        .match {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        .no-match {
+            color: #e74c3c;
+        }
+
+        button {
+            margin-top: 30px;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #7b3b65, #9e4e79);
+            color: white;
+            font-size: 20px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="signup-box">
-
-    <h2>Sign Up</h2>
+    <h2>🌸 Sign Up</h2>
 
     <form method="POST">
         {% csrf_token %}
 
-        <!-- Username -->
-        <label for="username">Όνομα χρήστη:</label>
+        <label>Όνομα χρήστη</label>
         {{ form.username }}
 
-        <!-- Email -->
-        <label for="email">Email:</label>
+        <label>Email</label>
         {{ form.email }}
 
-        <!-- Password -->
-        <label for="password">Password:</label>
-        {{ form.password }}
+        <label>Password</label>
+        <div class="password-wrapper">
+            {{ form.password }}
+            <span class="toggle-password" onclick="togglePassword('id_password')">👁️</span>
+        </div>
 
-        <!-- Confirm Password -->
-        <label for="confirm_password">Confirm password:</label>
-        {{ form.confirm_password }}
+        <div class="strength-bar">
+            <div id="strengthFill" class="strength-fill"></div>
+        </div>
 
-        <!-- Birth Date -->
-        <label for="Birth_Date">Ημερομηνία Γέννησης:</label>
+        <div class="rules" id="rules">
+            🔐 Τουλάχιστον 6 χαρακτήρες,
+            κεφαλαίο γράμμα,
+            αριθμό ή σύμβολο
+        </div>
+
+        <label>Confirm Password</label>
+        <div class="password-wrapper">
+            {{ form.confirm_password }}
+            <span class="toggle-password" onclick="togglePassword('id_confirm_password')">👁️</span>
+        </div>
+
+        <div id="matchStatus" class="match-status"></div>
+
+        <label>Ημερομηνία Γέννησης</label>
         {{ form.Birth_Date }}
 
-        <button type="submit">Sign Up</button>
+        <button type="submit">Δημιουργία Λογαριασμού</button>
     </form>
-
 </div>
+
+<script>
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        input.type = input.type === "password" ? "text" : "password";
+    }
+
+    const passwordInput = document.getElementById("id_password");
+    const confirmInput = document.getElementById("id_confirm_password");
+    const strengthFill = document.getElementById("strengthFill");
+    const matchStatus = document.getElementById("matchStatus");
+    const rules = document.getElementById("rules");
+
+    passwordInput.addEventListener("input", () => {
+        const value = passwordInput.value;
+        strengthFill.className = "strength-fill";
+
+        let strength = 0;
+        if (value.length >= 6) strength++;
+        if (/[A-Z]/.test(value)) strength++;
+        if (/[0-9]/.test(value) || /[^A-Za-z0-9]/.test(value)) strength++;
+
+        if (strength === 1) strengthFill.classList.add("weak");
+        else if (strength === 2) strengthFill.classList.add("medium");
+        else if (strength === 3) {
+            strengthFill.classList.add("strong");
+            rules.innerHTML = "✔️ Ισχυρός κωδικός";
+            rules.classList.add("valid");
+        } else {
+            rules.innerHTML = "🔐 Τουλάχιστον 6 χαρακτήρες, κεφαλαίο γράμμα, αριθμό ή σύμβολο";
+            rules.classList.remove("valid");
+        }
+
+        checkMatch();
+    });
+
+    confirmInput.addEventListener("input", checkMatch);
+
+    function checkMatch() {
+        if (!confirmInput.value) {
+            matchStatus.innerHTML = "";
+            return;
+        }
+
+        if (passwordInput.value === confirmInput.value) {
+            matchStatus.innerHTML = "✔️ Οι κωδικοί ταιριάζουν";
+            matchStatus.className = "match-status match";
+        } else {
+            matchStatus.innerHTML = "❌ Οι κωδικοί δεν ταιριάζουν";
+            matchStatus.className = "match-status no-match";
+        }
+    }
+</script>
 
 </body>
 </html>

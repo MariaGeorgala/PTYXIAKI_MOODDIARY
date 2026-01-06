@@ -6,116 +6,99 @@
     <title>Σύνδεση</title>
 
     <style>
-        /* ====== LOGIN PAGE STYLING (FULL) ====== */
-
         body {
-            font-family: Arial, sans-serif;
-            background: #f0f2f5;
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #e7c3d7, #c48aa3);
             margin: 0;
-            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: 0.3s;
         }
 
+        body.dark {
+            background: linear-gradient(135deg, #2a1f29, #1e1e1e);
+        }
+
+        /* CARD */
         .login-container {
             width: 420px;
-            margin: 80px auto;
             background: white;
-            padding: 40px;
-            border-radius: 18px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            padding: 50px 45px 45px;
+            border-radius: 26px;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.3);
             text-align: center;
-        }
-
-        /* TITLE */
-        h2 {
-            color: #333;
-            font-size: 34px;
-            margin-bottom: 30px;
-            font-weight: 700;
-        }
-
-        /* LABELS */
-        label {
-            display: block;
-            margin-top: 18px;
-            font-size: 18px;
-            color: #444;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        /* INPUTS */
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 16px;
-            margin-top: 8px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            font-size: 18px;
-            box-sizing: border-box;
-            transition: 0.2s;
-        }
-
-        input:focus {
-            border-color: #6a85ff;
-            box-shadow: 0 0 6px rgba(106,133,255,0.4);
-        }
-
-        /* BUTTON */
-        button {
-            width: 100%;
-            margin-top: 28px;
-            background: #6a85ff;
-            border: none;
-            color: white;
-            padding: 16px;
-            font-size: 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: 600;
-        }
-
-        button:hover {
-            background: #5068d9;
-        }
-
-        /* FORGOT + SIGNUP TEXT */
-        .signup-text,
-        .forgot-text {
-            margin-top: 20px;
-            font-size: 17px;
-        }
-
-        .signup-text a,
-        .forgot-text a {
-            color: #5068d9;
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 17px;
-        }
-
-        .signup-text a:hover,
-        .forgot-text a:hover {
-            text-decoration: underline;
-        }
-
-        /* DARK MODE */
-        body.dark {
-            background: #1e1e1e;
+            animation: fadeIn 0.6s ease;
+            position: relative;
         }
 
         body.dark .login-container {
             background: #2c2c2c;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+        }
+
+        /* MINI LOGO */
+        .mini-logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #7b3b65, #9e4e79);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            margin-top: 25px;
+            color: #5a2a4a;
+            font-size: 32px;
+            margin-bottom: 25px;
         }
 
         body.dark h2 {
-            color: #f0f0f0;
+            color: #f0d6e6;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-size: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #444;
         }
 
         body.dark label {
             color: #ddd;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-top: 6px;
+            border-radius: 12px;
+            border: 1px solid #bbb;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #9e4e79;
+            box-shadow: 0 0 10px rgba(158,78,121,0.35);
+            outline: none;
         }
 
         body.dark input {
@@ -124,51 +107,163 @@
             color: white;
         }
 
-        body.dark button {
-            background: #8da1ff;
+        /* PASSWORD */
+        .password-wrapper {
+            position: relative;
         }
 
+        .lock-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #777;
+            animation: lockPulse 1.8s infinite;
+        }
+
+        @keyframes lockPulse {
+            0% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.15); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+
+        .password-wrapper input {
+            padding-left: 40px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #777;
+        }
+
+        /* REMEMBER */
+        .remember {
+            display: flex;
+            align-items: center;
+            margin-top: 14px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .remember input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        /* ERROR */
+        .error-message {
+            margin-top: 15px;
+            padding: 12px;
+            background: #ffe6e6;
+            color: #b00020;
+            border-radius: 10px;
+            animation: shake 0.4s;
+            font-weight: 600;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        button {
+            width: 100%;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #7b3b65, #9e4e79);
+            border: none;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+
+        .forgot-text,
+        .signup-text {
+            margin-top: 22px;
+            font-size: 15px;
+        }
+
+        a {
+            color: #7b3b65;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* DARK TOGGLE */
         .dark-toggle {
             position: absolute;
             top: 20px;
             right: 20px;
-            padding: 10px 14px;
-            background: #fff;
-            border-radius: 8px;
+            padding: 10px 16px;
+            background: white;
+            border-radius: 10px;
             cursor: pointer;
             border: 1px solid #ccc;
+            font-weight: 600;
         }
 
         body.dark .dark-toggle {
             background: #333;
             color: white;
+            border-color: #555;
         }
-
     </style>
 </head>
 
 <body>
 
-<button class="dark-toggle" onclick="toggleDarkMode()">Dark Mode</button>
+<button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark</button>
 
 <div class="login-container">
 
-    <h2>Σύνδεση Χρήστη</h2>
+    <div class="mini-logo">🌸</div>
+
+    <h2>Σύνδεση</h2>
 
     {% if messages %}
         {% for message in messages %}
-            <p style="color:red;">{{ message }}</p>
+            <div class="error-message">{{ message }}</div>
         {% endfor %}
     {% endif %}
 
     <form method="POST">
         {% csrf_token %}
-        
-        <label for="username">Όνομα Χρήστη:</label>
-        <input type="text" name="username" required placeholder="Πληκτρολόγησε το όνομα">
 
-        <label for="password">Κωδικός:</label>
-        <input type="password" name="password" required placeholder="Πληκτρολόγησε τον κωδικό">
+        <label>Όνομα Χρήστη</label>
+        <input type="text" name="username" required>
+
+        <label>Κωδικός</label>
+        <div class="password-wrapper">
+            <span class="lock-icon">🔐</span>
+            <input type="password" name="password" id="password" required>
+            <span class="toggle-password" onclick="togglePassword()">👁️</span>
+        </div>
+
+        <div class="remember">
+            <input type="checkbox" name="remember">
+            Να με θυμάσαι
+        </div>
 
         <button type="submit">Σύνδεση</button>
     </form>
@@ -178,14 +273,20 @@
     </p>
 
     <p class="signup-text">
-        Δεν έχεις λογαριασμό; <a href="{% url 'signup' %}">Εγγραφή Χρήστη</a>
+        Δεν έχεις λογαριασμό;
+        <a href="{% url 'signup' %}">Εγγραφή Χρήστη</a>
     </p>
 
 </div>
 
 <script>
     function toggleDarkMode() {
-        document.body.classList.toggle('dark');
+        document.body.classList.toggle("dark");
+    }
+
+    function togglePassword() {
+        const input = document.getElementById("password");
+        input.type = input.type === "password" ? "text" : "password";
     }
 </script>
 

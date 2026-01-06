@@ -2,63 +2,237 @@
 {% load static %}
 
 {% block content %}
-<div class="profile-card">
 
-    <h2>Το Προφίλ μου</h2>
+<button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
 
-    {% if profile.profile_image %}
-        <img src="{{ profile.profile_image.url }}" class="profile-img">
-    {% else %}
-        <img src="{% static 'diary/default_pfp.png' %}" class="profile-img">
-    {% endif %}
+<div class="profile-wrapper">
+    <div class="profile-card">
 
-    <p><strong>Όνομα χρήστη:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Ημ/νία Γέννησης:</strong> {{ profile.Birth_Date|default:"—" }}</p>
+        <!-- HEADER -->
+        <div class="profile-header">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="avatar-wrapper">
+                    {% if profile.profile_image %}
+                        <img src="{{ profile.profile_image.url }}" class="avatar">
+                    {% else %}
+                        <img src="{% static 'diary/default_pfp.png' %}" class="avatar">
+                    {% endif %}
 
-    <hr>
+                    <label for="upload-image" class="avatar-edit">+</label>
+                    <input
+                        id="upload-image"
+                        type="file"
+                        name="profile_image"
+                        accept="image/*"
+                        onchange="this.form.submit()"
+                    >
+                </div>
+            </form>
 
-    <div class="profile-links">
-        <a href="{% url 'history' %}" class="btn-link">📜 Ιστορικό Διαθέσεων</a>
-        <a href="{% url 'stats' %}" class="btn-link">📊 Στατιστικά Χρήστη</a>
+            <h2>{{ user.username }}</h2>
+            <p class="email">{{ user.email }}</p>
+
+            <div class="badges">
+                <span>🎭 Mood Explorer</span>
+                <span>🌸 Active User</span>
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="profile-body">
+
+            <div class="progress">
+                <span>Ολοκλήρωση Προφίλ</span>
+                <div class="bar">
+                    <div class="fill"></div>
+                </div>
+            </div>
+
+            <div class="info">
+                <p>🎂 <strong>Ημ/νία Γέννησης:</strong> {{ profile.Birth_Date|default:"—" }}</p>
+                <p>🕒 <strong>Μέλος από:</strong> {{ user.date_joined|date:"F Y" }}</p>
+            </div>
+
+            <div class="actions">
+                <a href="{% url 'history' %}">📜 Ιστορικό</a>
+                <a href="{% url 'stats' %}">📊 Στατιστικά</a>
+            </div>
+
+        </div>
     </div>
-
 </div>
 
 <style>
-.profile-card{
-    width:450px;
-    margin:40px auto;
-    background:white;
-    padding:30px;
-    border-radius:16px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.15);
-    text-align:center;
-    font-family:Segoe UI;
+/* ===== LAYOUT ===== */
+.profile-wrapper{
+    display:flex;
+    justify-content:center;
+    padding:40px 0;
 }
-.profile-img{
-    width:150px;
-    height:150px;
+
+.profile-card{
+    width:380px;
+    background:white;
+    border-radius:26px;
+    overflow:hidden;
+    box-shadow:0 15px 40px rgba(0,0,0,0.2);
+    transition:0.3s;
+    font-family:Segoe UI, sans-serif;
+}
+
+/* ===== HEADER ===== */
+.profile-header{
+    background:linear-gradient(135deg,#7b3b65,#9e4e79);
+    color:white;
+    text-align:center;
+    padding:35px 20px;
+}
+
+.avatar-wrapper{
+    position:relative;
+    width:120px;
+    height:120px;
+    margin:0 auto 15px;
+}
+
+.avatar{
+    width:120px;
+    height:120px;
     border-radius:50%;
     object-fit:cover;
-    border:3px solid #ddd;
-    margin-bottom:20px;
+    border:4px solid white;
 }
-.profile-links{
+
+.avatar-edit{
+    position:absolute;
+    bottom:5px;
+    right:5px;
+    width:32px;
+    height:32px;
+    background:white;
+    color:#7b3b65;
+    border-radius:50%;
     display:flex;
-    justify-content:space-around;
-    margin-top:20px;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
 }
-.btn-link{
-    background:#6a85ff;
+
+/* ΚΡΥΒΟΥΜΕ ΤΕΛΕΙΩΣ ΤΟ INPUT */
+#upload-image{
+    display:none;
+}
+
+.email{
+    font-size:14px;
+    opacity:0.9;
+}
+
+.badges span{
+    display:inline-block;
+    margin:6px 4px;
+    padding:5px 12px;
+    background:rgba(255,255,255,0.25);
+    border-radius:14px;
+    font-size:13px;
+}
+
+/* ===== BODY ===== */
+.profile-body{
+    padding:22px;
+}
+
+.progress span{
+    font-size:14px;
+    font-weight:600;
+}
+
+.bar{
+    height:8px;
+    background:#eee;
+    border-radius:8px;
+    margin-top:6px;
+    overflow:hidden;
+}
+
+.fill{
+    width:70%;
+    height:100%;
+    background:linear-gradient(135deg,#7b3b65,#9e4e79);
+}
+
+.info{
+    margin:18px 0;
+    font-size:14px;
+    color:#444;
+}
+
+/* ACTION BUTTONS */
+.actions{
+    display:flex;
+    justify-content:space-between;
+}
+
+.actions a{
+    flex:1;
+    margin:0 6px;
+    text-align:center;
+    padding:10px;
+    border-radius:16px;
+    background:linear-gradient(135deg,#7b3b65,#9e4e79);
     color:white;
-    padding:10px 16px;
-    border-radius:12px;
     text-decoration:none;
     font-size:14px;
+    transition:0.3s;
 }
-.btn-link:hover{
-    background:#4f6bf5;
+
+.actions a:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 15px rgba(0,0,0,0.25);
+}
+
+/* ===== DARK MODE ===== */
+body.dark{
+    background:#1e1e1e;
+}
+
+body.dark .profile-card{
+    background:#2c2c2c;
+    color:#ddd;
+}
+
+body.dark .info{
+    color:#ccc;
+}
+
+body.dark .bar{
+    background:#444;
+}
+
+/* TOGGLE */
+.dark-toggle{
+    position:fixed;
+    top:18px;
+    right:18px;
+    padding:8px 12px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
 }
 </style>
+
+<script>
+function toggleDarkMode(){
+    document.body.classList.toggle("dark");
+    localStorage.setItem("dark", document.body.classList.contains("dark"));
+}
+
+if(localStorage.getItem("dark") === "true"){
+    document.body.classList.add("dark");
+}
+</script>
+
 {% endblock %}
