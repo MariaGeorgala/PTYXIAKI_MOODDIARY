@@ -21,7 +21,6 @@
             background: linear-gradient(135deg, #2a1f29, #1e1e1e);
         }
 
-        /* CARD */
         .login-container {
             width: 420px;
             background: white;
@@ -37,7 +36,6 @@
             background: #2c2c2c;
         }
 
-        /* MINI LOGO */
         .mini-logo {
             width: 70px;
             height: 70px;
@@ -107,7 +105,6 @@
             color: white;
         }
 
-        /* PASSWORD */
         .password-wrapper {
             position: relative;
         }
@@ -142,7 +139,6 @@
             color: #777;
         }
 
-        /* REMEMBER */
         .remember {
             display: flex;
             align-items: center;
@@ -156,7 +152,6 @@
             margin-right: 8px;
         }
 
-        /* ERROR */
         .error-message {
             margin-top: 15px;
             padding: 12px;
@@ -210,7 +205,6 @@
             text-decoration: underline;
         }
 
-        /* DARK TOGGLE */
         .dark-toggle {
             position: absolute;
             top: 20px;
@@ -233,13 +227,13 @@
 
 <body>
 
-<button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark</button>
+<button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
 
 <div class="login-container">
 
     <div class="mini-logo">🌸</div>
 
-    <h2>Σύνδεση</h2>
+    <h2>Σύνδεση Xρήστη</h2>
 
     {% if messages %}
         {% for message in messages %}
@@ -257,7 +251,7 @@
         <div class="password-wrapper">
             <span class="lock-icon">🔐</span>
             <input type="password" name="password" id="password" required>
-            <span class="toggle-password" onclick="togglePassword()">👁️</span>
+            <span class="toggle-password" onclick="togglePassword()"></span>
         </div>
 
         <div class="remember">

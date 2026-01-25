@@ -1,49 +1,67 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
+
 from .models import MoodEntry
-from mood.llm import analyze_conversation_with_llm, generate_questions
+from mood.llm import (
+    analyze_conversation_with_llm,
+    generate_adaptive_question,
+    generate_followup_question
+)
 
 
-# ---------------- HOME ----------------
 def home(request):
     return render(request, "diary/home.html")
 
 
-# ---------------- LOG MOOD ----------------
 @login_required
 def log_mood(request):
 
-    # 🟢 Αν δεν υπάρχει session → αρχικοποίηση
     if "answers" not in request.session:
         request.session["answers"] = []
-        request.session["question_index"] = 0
-        request.session["questions"] = generate_questions()  #na tiponei erotiseis gia na dei an einai 5
+        request.session["step"] = 1
+
+        last_entries = MoodEntry.objects.filter(
+            user=request.user
+        ).order_by("-date")[:3]
+
+        emotion_memory = [e.mood for e in last_entries]
+        request.session["emotion_memory"] = emotion_memory
+
+        question = generate_adaptive_question(
+            previous_answers=[],
+            step=1,
+            emotion_memory=emotion_memory
+        )
+        request.session["current_question"] = question
 
     answers = request.session["answers"]
-    index = request.session["question_index"]
-    questions = request.session["questions"]
+    step = request.session["step"]
+    question = request.session["current_question"]
 
-    # 🟢 Αν ο χρήστης απαντήσει
     if request.method == "POST":
         answer = request.POST.get("response")
 
         if not answer:
             return render(request, "diary/log_mood.html", {
-                "question": questions[index],
-                "error": "Παρακαλώ γράψτε μια απάντηση."
+                "question": question,
+                "error": "Γράψε μια απάντηση 🙂"
             })
 
         answers.append(answer)
         request.session["answers"] = answers
-        request.session["question_index"] = index + 1
+        request.session["step"] = step + 1
 
-        # 🟢 Όταν συμπληρωθούν 5 απαντήσεις
         if len(answers) >= 5:
             result = analyze_conversation_with_llm(answers)
 
-            emotion = result.split("-")[0].strip()
-            score = int(result.split("-")[1].strip())
+            try:
+                emotion, score = result.split("-")
+                emotion = emotion.strip()
+                score = int(score.strip())
+            except:
+                emotion = "ουδέτερο"
+                score = 5
 
             MoodEntry.objects.create(
                 user=request.user,
@@ -52,36 +70,47 @@ def log_mood(request):
                 response=str(answers)
             )
 
-            # καθαρισμός session
-            for key in ["answers", "question_index", "questions"]:
+            for key in ["answers", "step", "current_question", "emotion_memory"]:
                 request.session.pop(key, None)
 
+            # 🔥 ΕΔΩ ΟΛΗ Η ΛΟΓΙΚΗ ΤΗΣ ΜΠΑΡΑΣ
+            score_class = (
+                "low" if score < 4 else
+                "medium" if score < 7 else
+                "high" if score < 9 else
+                "extreme"
+            )
+
             return render(request, "diary/result.html", {
-                "result": result,
                 "emotion": emotion,
-                "score": score
+                "score": score,
+                "score_percent": score * 10,
+                "score_class": score_class
             })
 
-    # 🟢 Ασφάλεια: αν index ξεφύγει
-    if index >= len(questions):
-        request.session["question_index"] = 0
-        index = 0
+        if step % 2 == 0:
+            next_question = generate_followup_question(answers)
+        else:
+            next_question = generate_adaptive_question(
+                previous_answers=answers,
+                step=step + 1,
+                emotion_memory=request.session["emotion_memory"]
+            )
 
-    question = questions[index]
+        request.session["current_question"] = next_question
+        return redirect("log_mood")
 
     return render(request, "diary/log_mood.html", {
         "question": question
     })
 
 
-# ---------------- HISTORY ----------------
 @login_required
 def history_view(request):
     entries = MoodEntry.objects.filter(user=request.user).order_by("-date")
     return render(request, "diary/history.html", {"entries": entries})
 
 
-# ---------------- STATS ----------------
 @login_required
 def stats_view(request):
     entries = MoodEntry.objects.filter(user=request.user)
@@ -91,16 +120,5 @@ def stats_view(request):
 
     return render(request, "diary/stats.html", {
         "avg_score": avg_score,
-        "mood_counts": mood_counts,
-        "entries": entries
-    })
-
-@login_required
-def history_view(request):
-    entries = MoodEntry.objects.filter(
-        user=request.user
-    ).order_by("-date")
-
-    return render(request, "diary/history.html", {
-        "entries": entries
+        "mood_counts": mood_counts
     })

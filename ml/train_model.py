@@ -36,7 +36,7 @@ def train_model():
     model.save_pretrained("./ml/mood_model")
     tokenizer.save_pretrained("./ml/mood_model")
 
-    print("✅ Εκπαιδεύτηκε και αποθηκεύτηκε επιτυχώς το μοντέλο!")
+    print(" Εκπαιδεύτηκε και αποθηκεύτηκε επιτυχώς το μοντέλο!")
 
 if __name__ == "__main__":
     train_model()

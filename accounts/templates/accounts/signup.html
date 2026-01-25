@@ -10,10 +10,50 @@
             background: linear-gradient(135deg, #e7c3d7, #c48aa3);
             font-family: "Segoe UI", sans-serif;
             margin: 0;
+            padding-top: 90px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 70px;
+            background: #2b2b2b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1000;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            margin-right: 15px;
+        }
+
+        .nav-right button,
+        .nav-right a {
+            background: transparent;
+            border: 1px solid #ccc;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        /* ===== SIGNUP CARD ===== */
+        .signup-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: calc(100vh - 90px);
         }
 
         .signup-box {
@@ -23,11 +63,6 @@
             border-radius: 24px;
             box-shadow: 0 12px 35px rgba(0,0,0,0.25);
             animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-25px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         h2 {
@@ -41,7 +76,6 @@
             margin-top: 15px;
             display: block;
             font-weight: 600;
-            color: #444;
         }
 
         input {
@@ -51,16 +85,8 @@
             border: 1px solid #bbb;
             margin-top: 6px;
             font-size: 16px;
-            transition: 0.3s;
         }
 
-        input:focus {
-            border-color: #9e4e79;
-            box-shadow: 0 0 10px rgba(158,78,121,0.35);
-            outline: none;
-        }
-
-        /* PASSWORD WRAPPER */
         .password-wrapper {
             position: relative;
         }
@@ -72,56 +98,17 @@
             transform: translateY(-50%);
             cursor: pointer;
             font-size: 18px;
-            color: #777;
         }
 
-        /* PASSWORD STRENGTH */
-        .strength-bar {
-            height: 8px;
-            border-radius: 10px;
-            margin-top: 8px;
-            background: #eee;
-            overflow: hidden;
-        }
-
-        .strength-fill {
-            height: 100%;
-            width: 0%;
-            transition: 0.3s;
-        }
-
-        .weak { background: #e74c3c; width: 33%; }
-        .medium { background: #f1c40f; width: 66%; }
-        .strong { background: #2ecc71; width: 100%; }
-
-        /* RULES */
-        .rules {
-            font-size: 14px;
-            margin-top: 8px;
-            color: #777;
-        }
-
-        .rules span.valid {
-            color: #2ecc71;
-            font-weight: 600;
-        }
-
-        /* MATCH CHECK */
         .match-status {
             font-size: 15px;
-            margin-top: 6px;
+            margin-top: 8px;
         }
 
-        .match {
-            color: #2ecc71;
-            font-weight: 600;
-        }
+        .match { color: #2ecc71; font-weight: 600; }
+        .no-match { color: #e74c3c; }
 
-        .no-match {
-            color: #e74c3c;
-        }
-
-        button {
+        button[type="submit"] {
             margin-top: 30px;
             width: 100%;
             padding: 15px;
@@ -131,19 +118,40 @@
             border: none;
             border-radius: 14px;
             cursor: pointer;
-            transition: 0.3s;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        /* ===== DARK MODE ===== */
+        body.dark {
+            background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+            color: #eee;
+        }
+
+        body.dark .signup-box {
+            background: #2c2c2c;
+        }
+
+        body.dark input {
+            background: #3a3a3a;
+            color: white;
+            border: 1px solid #555;
         }
     </style>
 </head>
 
 <body>
 
+<!-- NAVBAR -->
+<div class="navbar">
+    <div>🌸 MoodDiary</div>
+    <div class="nav-right">
+        <button onclick="toggleDarkMode()">🌙</button>
+        <a href="{% url 'login' %}">🔑 Σύνδεση</a>
+    </div>
+</div>
+
+<div class="signup-wrapper">
 <div class="signup-box">
+
     <h2>🌸 Sign Up</h2>
 
     <form method="POST">
@@ -161,16 +169,6 @@
             <span class="toggle-password" onclick="togglePassword('id_password')">👁️</span>
         </div>
 
-        <div class="strength-bar">
-            <div id="strengthFill" class="strength-fill"></div>
-        </div>
-
-        <div class="rules" id="rules">
-            🔐 Τουλάχιστον 6 χαρακτήρες,
-            κεφαλαίο γράμμα,
-            αριθμό ή σύμβολο
-        </div>
-
         <label>Confirm Password</label>
         <div class="password-wrapper">
             {{ form.confirm_password }}
@@ -184,59 +182,41 @@
 
         <button type="submit">Δημιουργία Λογαριασμού</button>
     </form>
+
+</div>
 </div>
 
 <script>
-    function togglePassword(id) {
-        const input = document.getElementById(id);
-        input.type = input.type === "password" ? "text" : "password";
+function togglePassword(id){
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+function toggleDarkMode(){
+    document.body.classList.toggle("dark");
+    localStorage.setItem("dark", document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("dark")==="true"){
+    document.body.classList.add("dark");
+}
+
+const passwordInput = document.getElementById("id_password");
+const confirmInput = document.getElementById("id_confirm_password");
+const matchStatus = document.getElementById("matchStatus");
+
+confirmInput.addEventListener("input", () => {
+    if (!confirmInput.value) {
+        matchStatus.innerHTML = "";
+        return;
     }
-
-    const passwordInput = document.getElementById("id_password");
-    const confirmInput = document.getElementById("id_confirm_password");
-    const strengthFill = document.getElementById("strengthFill");
-    const matchStatus = document.getElementById("matchStatus");
-    const rules = document.getElementById("rules");
-
-    passwordInput.addEventListener("input", () => {
-        const value = passwordInput.value;
-        strengthFill.className = "strength-fill";
-
-        let strength = 0;
-        if (value.length >= 6) strength++;
-        if (/[A-Z]/.test(value)) strength++;
-        if (/[0-9]/.test(value) || /[^A-Za-z0-9]/.test(value)) strength++;
-
-        if (strength === 1) strengthFill.classList.add("weak");
-        else if (strength === 2) strengthFill.classList.add("medium");
-        else if (strength === 3) {
-            strengthFill.classList.add("strong");
-            rules.innerHTML = "✔️ Ισχυρός κωδικός";
-            rules.classList.add("valid");
-        } else {
-            rules.innerHTML = "🔐 Τουλάχιστον 6 χαρακτήρες, κεφαλαίο γράμμα, αριθμό ή σύμβολο";
-            rules.classList.remove("valid");
-        }
-
-        checkMatch();
-    });
-
-    confirmInput.addEventListener("input", checkMatch);
-
-    function checkMatch() {
-        if (!confirmInput.value) {
-            matchStatus.innerHTML = "";
-            return;
-        }
-
-        if (passwordInput.value === confirmInput.value) {
-            matchStatus.innerHTML = "✔️ Οι κωδικοί ταιριάζουν";
-            matchStatus.className = "match-status match";
-        } else {
-            matchStatus.innerHTML = "❌ Οι κωδικοί δεν ταιριάζουν";
-            matchStatus.className = "match-status no-match";
-        }
+    if (passwordInput.value === confirmInput.value) {
+        matchStatus.innerHTML = "✔️ Οι κωδικοί ταιριάζουν";
+        matchStatus.className = "match-status match";
+    } else {
+        matchStatus.innerHTML = "❌ Οι κωδικοί δεν ταιριάζουν";
+        matchStatus.className = "match-status no-match";
     }
+});
 </script>
 
 </body>

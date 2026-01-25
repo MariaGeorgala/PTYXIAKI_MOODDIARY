@@ -4,51 +4,249 @@
 {% block title %}Ιστορικό Διάθεσης{% endblock %}
 
 {% block content %}
-<h2>Ιστορικό Καταγραφών</h2>
+<div class="page-navbar">
+  <div class="nav-left">
+    <a href="{% url 'profile' %}" class="nav-btn">👤 Προφίλ</a>
+    <a href="{% url 'stats' %}" class="nav-btn">📊 Στατιστικά</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="nav-btn dark-btn" onclick="toggleDarkMode()">🌙</button>
+  </div>
+</div>
+
+<div class="history-wrapper">
+
+  <h2 class="title">📜 Ιστορικό Καταγραφών</h2>
+
+  <form method="get" class="filter-box">
+    <input type="date" name="start_date" value="{{ request.GET.start_date }}">
+    <input type="date" name="end_date" value="{{ request.GET.end_date }}">
+    <input
+      type="text"
+      name="q"
+      placeholder="🔍 Αναζήτηση με λέξη..."
+      value="{{ request.GET.q }}"
+    >
+    <button type="submit">Φιλτρο</button>
+  </form>
+
+  {% if entries %}
+    {% for entry in entries %}
+      <div class="entry-card {% if entry.pinned %}pinned{% endif %}">
+
+        <div class="entry-header">
+          <span class="date">
+            📅 {{ entry.created_at|date:"l d F Y" }}<br>
+            ⏰ {{ entry.created_at|date:"H:i" }}
+          </span>
+
+          <div class="right">
+            <span class="mood-pill">
+              {{ entry.mood }} · {{ entry.score }}/10
+            </span>
+
+            {% if entry.pinned %}
+              <span class="pin" title="Σημαντική καταγραφή">📌</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="entry-body">
+          <p>
+            <strong>Απάντηση:</strong><br>
+            {{ entry.response }}
+          </p>
+
+          {% if entry.notes %}
+          <p class="notes">
+            <strong>📝 Σημειώσεις:</strong><br>
+            {{ entry.notes }}
+          </p>
+          {% endif %}
+        </div>
+
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="empty">Δεν υπάρχουν καταγραφές.</p>
+  {% endif %}
+
+</div>
 
 <style>
-    .entry-box {
-        background: #e58282;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .entry-header {
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    .mood-tag {
-        padding: 4px 10px;
-        border-radius: 6px;
-        color: white;
-        display: inline-block;
-        margin-bottom: 5px;
-    }
+.page-navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:white;
+  padding:14px 18px;
+  border-radius:18px;
+  margin:20px auto 30px;
+  max-width:900px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+
+.nav-left,
+.nav-right{
+  display:flex;
+  gap:10px;
+}
+
+.nav-btn{
+  padding:8px 14px;
+  border-radius:14px;
+  background:#f2f2f2;
+  border:none;
+  text-decoration:none;
+  font-weight:600;
+  color:#333;
+  cursor:pointer;
+}
+
+.dark-btn{
+  background:#7b3b65;
+  color:white;
+}
+
+.history-wrapper{
+  max-width:900px;
+  margin:0 auto 40px;
+  font-family:Segoe UI,sans-serif;
+}
+
+.title{
+  font-size:32px;
+  margin-bottom:20px;
+  text-align:center;
+}
+
+/* FILTERS */
+.filter-box{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:25px;
+}
+
+.filter-box input{
+  padding:8px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+.filter-box button{
+  padding:8px 16px;
+  border:none;
+  border-radius:12px;
+  background:#7b3b65;
+  color:white;
+  font-weight:600;
+}
+
+/* ENTRY CARD */
+.entry-card{
+  background:white;
+  padding:22px;
+  border-radius:22px;
+  box-shadow:0 8px 22px rgba(0,0,0,0.12);
+  margin-bottom:22px;
+  transition:0.25s;
+}
+
+.entry-card:hover{
+  transform:translateY(-2px);
+}
+
+.entry-card.pinned{
+  border-left:6px solid #f1c40f;
+}
+
+.entry-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+
+.right{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.date{
+  font-size:14px;
+  color:#666;
+  line-height:1.4;
+}
+
+.mood-pill{
+  background:linear-gradient(135deg,#7b3b65,#9e4e79);
+  color:white;
+  padding:6px 14px;
+  border-radius:18px;
+  font-weight:600;
+  font-size:14px;
+}
+
+/* BODY */
+.entry-body p{
+  margin:10px 0;
+  line-height:1.55;
+}
+
+.notes{
+  background:#f6f0f3;
+  padding:12px;
+  border-radius:14px;
+  margin-top:12px;
+}
+
+.empty{
+  color:#888;
+  font-style:italic;
+  text-align:center;
+}
+
+/* DARK MODE */
+body.dark{
+  background:#1e1e1e;
+}
+
+body.dark .page-navbar,
+body.dark .entry-card{
+  background:#2c2c2c;
+  color:#ddd;
+}
+
+body.dark .nav-btn{
+  background:#3a3a3a;
+  color:#ddd;
+}
+
+body.dark .dark-btn{
+  background:#9e4e79;
+}
+
+body.dark .notes{
+  background:#3a3a3a;
+}
+
+body.dark .date{
+  color:#bbb;
+}
 </style>
 
-{% if entries %}
-    {% for entry in entries %}
-        <div class="entry-box">
-            <div class="entry-header">
-                Ημερομηνία: {{ entry.created_at|date:"d/m/Y H:i" }}
-            </div>
+<script>
+function toggleDarkMode(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark", document.body.classList.contains("dark"));
+}
 
-            <div>
-                <span class="mood-tag" style="background:#4a73ff;">
-                    {{ entry.mood }} - {{ entry.score }}
-                </span>
-            </div>
-
-            <p><strong>Απαντήσεις:</strong> {{ entry.response }}</p>
-
-            {% if entry.notes %}
-            <p><strong>Σημειώσεις:</strong> {{ entry.notes }}</p>
-            {% endif %}
-        </div>
-    {% endfor %}
-{% else %}
-    <p>Δεν υπάρχουν ακόμα καταγραφές.</p>
-{% endif %}
+if(localStorage.getItem("dark")==="true"){
+  document.body.classList.add("dark");
+}
+</script>
 
 {% endblock %}

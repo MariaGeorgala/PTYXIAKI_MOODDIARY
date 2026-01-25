@@ -1,28 +1,36 @@
 {% extends "diary/base.html" %}
-
+{% load static %}
 {% block content %}
 
-<!-- DARK MODE TOGGLE -->
-<button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+<!-- ================= MINI NAVBAR ================= -->
+<div class="mini-navbar">
+    <div class="left">
+        <a href="{% url 'home' %}">🏠 Αρχική</a>
+        <a href="{% url 'profile' %}">👤 Προφίλ</a>
+    </div>
+    <button class="dark-toggle" onclick="toggleDarkMode()">Dark Mode🌙</button>
+</div>
 
-<div class="mood-card fade-in">
+<div class="page-wrapper mood-{{ current_mood|default:'neutral' }}">
+
+<div class="mood-card fade-in glass">
 
     <!-- HEADER -->
     <div class="mood-header">
-        <h2>Ερώτηση {{ request.session.question_index|add:1 }} από 5</h2>
-        <p class="subtitle">
-            Πάρε μια βαθιά ανάσα και απάντησε ειλικρινά 🌿
-        </p>
+        <span class="step">
+            Ερώτηση {{ request.session.question_index|add:1 }} / 5
+        </span>
+        <h2>Καταγραφή Διάθεσης</h2>
 
-        <!-- PROGRESS BAR -->
         <div class="progress-bar">
             <div class="progress-fill step-{{ request.session.question_index|add:1 }}"></div>
         </div>
     </div>
 
-    <!-- QUESTION -->
-    <div class="question-box">
-        <p class="question-text">{{ question }}</p>
+    <div class="chat">
+        <div class="bubble bot">
+            🤖 <span id="botText"></span>
+        </div>
     </div>
 
     {% if error %}
@@ -33,213 +41,152 @@
     <form method="POST" class="mood-form">
         {% csrf_token %}
 
-        <label class="label">✍️ Η απάντησή σου</label>
+        <label class="label">📝 Θες να το περιγράψεις;</label>
         <textarea
             name="response"
             rows="5"
+            placeholder="Γράψε ό,τι σου έρχεται στο μυαλό…"
             required
-            placeholder="Γράψε ελεύθερα τις σκέψεις σου εδώ..."
         ></textarea>
 
         <button type="submit" class="btn-next">
-            Επόμενη →
+            Συνέχισε →
         </button>
     </form>
 
-    <!-- BACK TO PROFILE -->
-    <div class="back-profile">
-        <a href="{% url 'profile' %}">← Επιστροφή στο προφίλ μου</a>
-    </div>
-
+</div>
 </div>
 
 <style>
-/* ===== TOGGLE ===== */
+/* ===== PAGE BACKGROUND ανά συναίσθημα ===== */
+.page-wrapper{
+    min-height:100vh;
+    padding-bottom:60px;
+}
+.page-wrapper.mood-happy{background:linear-gradient(135deg,#fff4d6,#ffe9a8);}
+.page-wrapper.mood-sad{background:linear-gradient(135deg,#e3ecff,#cfdcff);}
+.page-wrapper.mood-angry{background:linear-gradient(135deg,#ffe1e1,#ffb3b3);}
+.page-wrapper.mood-anxious{background:linear-gradient(135deg,#ede7ff,#d8ccff);}
+.page-wrapper.mood-neutral{background:linear-gradient(135deg,#f5f5f5,#ededed);}
+
+/* MINI NAVBAR */
+.mini-navbar{
+    position:sticky;
+    top:90px;
+    z-index:40;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:20px auto 30px;
+    padding:12px 18px;
+    max-width:900px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(12px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+.mini-navbar a{
+    font-weight:700;
+    text-decoration:none;
+    color:#7b3b65;
+}
 .dark-toggle{
-    position:fixed;
-    top:18px;
-    right:18px;
-    padding:8px 12px;
     border:none;
-    border-radius:10px;
-    cursor:pointer;
-    background:#333;
+    background:#7b3b65;
     color:white;
+    padding:8px 14px;
+    border-radius:14px;
 }
 
-/* ===== CARD ===== */
+/* CARD */
 .mood-card{
-    width:min(900px, 94%);
-    margin:50px auto;
-    background:white;
-    padding:40px;
-    border-radius:22px;
-    box-shadow:0 14px 35px rgba(0,0,0,0.15);
-    font-family:"Segoe UI", sans-serif;
-    transition:0.3s;
+    width:min(900px,95%);
+    margin:0 auto;
+    padding:45px;
+    border-radius:28px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.2);
+    font-family:"Segoe UI",sans-serif;
+}
+.glass{
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(14px);
 }
 
-/* FADE ANIMATION */
-.fade-in{
-    animation:fadeSlide 0.6s ease;
-}
+/* HEADER */
+.step{font-size:14px;color:#c86ea3;font-weight:700;}
+.mood-header h2{font-size:34px;margin:10px 0;}
 
-@keyframes fadeSlide{
-    from{opacity:0; transform:translateY(25px);}
-    to{opacity:1; transform:translateY(0);}
-}
-
-/* ===== HEADER ===== */
-.mood-header h2{
-    font-size:32px;
-    margin-bottom:6px;
-    color:#3b2b3f;
-}
-
-.subtitle{
-    font-size:17px;
-    color:#6b5f73;
-    margin-bottom:18px;
-}
-
-/* ===== PROGRESS ===== */
+/* PROGRESS */
 .progress-bar{
-    width:100%;
     height:8px;
     background:#eee;
     border-radius:8px;
-    overflow:hidden;
+    margin-top:16px;
 }
-
 .progress-fill{
     height:100%;
-    background:linear-gradient(135deg,#7b3b65,#9e4e79);
-    transition:width 0.4s ease;
+    background:linear-gradient(135deg,#7b3b65,#c86ea3);
 }
+.step-1{width:20%;}
+.step-2{width:40%;}
+.step-3{width:60%;}
+.step-4{width:80%;}
+.step-5{width:100%;}
 
-.progress-fill.step-1{ width:20%; }
-.progress-fill.step-2{ width:40%; }
-.progress-fill.step-3{ width:60%; }
-.progress-fill.step-4{ width:80%; }
-.progress-fill.step-5{ width:100%; }
-
-/* ===== QUESTION ===== */
-.question-box{
-    background:linear-gradient(135deg,#7b3b65,#9e4e79);
-    padding:26px;
-    border-radius:18px;
-    margin:26px 0 20px;
-}
-
-.question-text{
-    font-size:24px;
+/* CHAT */
+.chat{margin:30px 0;}
+.bubble.bot{
+    background:linear-gradient(135deg,#7b3b65,#c86ea3);
     color:white;
-    margin:0;
-    font-weight:700;
-    line-height:1.4;
+    padding:20px 24px;
+    border-radius:22px;
+    font-size:18px;
+    max-width:80%;
 }
 
-/* ===== FORM ===== */
-.label{
-    display:block;
-    font-size:17px;
-    margin-bottom:10px;
-    color:#3b2b3f;
-    font-weight:700;
+/* BOT IMAGE */
+.bot-visual{
+    margin:25px 0;
+    display:flex;
+    justify-content:center;
+}
+.bot-visual img{
+    width:160px;
+    border-radius:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
 }
 
+/* FORM */
 textarea{
     width:100%;
-    font-size:17px;
-    padding:16px;
-    border-radius:16px;
-    border:1px solid #d9d9d9;
-    resize:vertical;
-    transition:0.25s;
-    box-sizing:border-box;
-    background:#fafafa;
+    padding:18px;
+    border-radius:18px;
+    border:1px solid #ddd;
+    font-size:16px;
 }
-
-textarea:focus{
-    border-color:#9e4e79;
-    box-shadow:0 0 0 4px rgba(158,78,121,0.18);
-    outline:none;
-    background:white;
-}
-
-/* ===== BUTTON ===== */
 .btn-next{
     width:100%;
     margin-top:22px;
-    background:linear-gradient(135deg,#7b3b65,#9e4e79);
-    color:white;
-    border:none;
     padding:16px;
-    border-radius:18px;
+    border:none;
+    border-radius:20px;
     font-size:19px;
     font-weight:700;
-    cursor:pointer;
-    transition:0.25s;
-}
-
-.btn-next:hover{
-    transform:translateY(-2px);
-    box-shadow:0 8px 18px rgba(0,0,0,0.25);
-}
-
-/* ===== BACK ===== */
-.back-profile{
-    text-align:center;
-    margin-top:22px;
-}
-
-.back-profile a{
-    color:#7b3b65;
-    font-weight:600;
-    text-decoration:none;
-}
-
-.back-profile a:hover{
-    text-decoration:underline;
-}
-
-/* ===== ERROR ===== */
-.error-box{
-    background:#ffe3e3;
-    color:#8b1a1a;
-    padding:14px 16px;
-    border-radius:14px;
-    margin-bottom:16px;
-    font-size:16px;
-    font-weight:600;
-}
-
-/* ===== DARK MODE ===== */
-body.dark{
-    background:#1e1e1e;
-}
-
-body.dark .mood-card{
-    background:#2c2c2c;
-    color:#ddd;
-}
-
-body.dark .subtitle{
-    color:#bbb;
-}
-
-body.dark .progress-bar{
-    background:#444;
-}
-
-body.dark textarea{
-    background:#3a3a3a;
-    border:1px solid #555;
+    background:linear-gradient(135deg,#7b3b65,#c86ea3);
     color:white;
 }
 
-body.dark .label{
-    color:#ddd;
+/* DARK MODE */
+body.dark .glass,
+body.dark .mini-navbar{background:rgba(35,35,35,0.9);}
+body.dark textarea{background:#2f2f2f;color:white;}
+body.dark a{color:#f1b6d8;}
+
+/* ANIMATION */
+.fade-in{animation:fadeSlide .7s ease;}
+@keyframes fadeSlide{
+    from{opacity:0;transform:translateY(30px);}
+    to{opacity:1;}
 }
 </style>
 
@@ -248,10 +195,23 @@ function toggleDarkMode(){
     document.body.classList.toggle("dark");
     localStorage.setItem("dark", document.body.classList.contains("dark"));
 }
-
 if(localStorage.getItem("dark")==="true"){
     document.body.classList.add("dark");
 }
+
+/* TYPING ANIMATION */
+const botMessage = "{{ question|escapejs }}";
+const botTextEl = document.getElementById("botText");
+let i = 0;
+
+function typeBot(){
+    if(i < botMessage.length){
+        botTextEl.innerHTML += botMessage.charAt(i);
+        i++;
+        setTimeout(typeBot, 35);
+    }
+}
+typeBot();
 </script>
 
 {% endblock %}

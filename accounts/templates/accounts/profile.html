@@ -3,235 +3,301 @@
 
 {% block content %}
 
-<button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+<div class="profile-wrapper mood-{{ current_mood }}">
+  <div class="profile-card">
 
-<div class="profile-wrapper">
-    <div class="profile-card">
-
-        <!-- HEADER -->
-        <div class="profile-header">
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="avatar-wrapper">
-                    {% if profile.profile_image %}
-                        <img src="{{ profile.profile_image.url }}" class="avatar">
-                    {% else %}
-                        <img src="{% static 'diary/default_pfp.png' %}" class="avatar">
-                    {% endif %}
-
-                    <label for="upload-image" class="avatar-edit">+</label>
-                    <input
-                        id="upload-image"
-                        type="file"
-                        name="profile_image"
-                        accept="image/*"
-                        onchange="this.form.submit()"
-                    >
-                </div>
-            </form>
-
-            <h2>{{ user.username }}</h2>
-            <p class="email">{{ user.email }}</p>
-
-            <div class="badges">
-                <span>🎭 Mood Explorer</span>
-                <span>🌸 Active User</span>
-            </div>
+    <!-- HEADER -->
+    <div class="profile-header">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="avatar-wrapper">
+          <img
+            src="{% if profile.profile_image %}{{ profile.profile_image.url }}{% else %}{% static 'diary/default_pfp.png' %}{% endif %}"
+            class="avatar"
+          >
+          <label for="upload-image" class="avatar-edit">📷</label>
+          <input id="upload-image" type="file" name="profile_image"
+                 accept="image/*" onchange="this.form.submit(); showToast('📸 Η εικόνα ενημερώθηκε!')">
         </div>
+      </form>
 
-        <!-- BODY -->
-        <div class="profile-body">
+      <h2 class="username">{{ user.username }}</h2>
+      <p class="email">{{ user.email }}</p>
 
-            <div class="progress">
-                <span>Ολοκλήρωση Προφίλ</span>
-                <div class="bar">
-                    <div class="fill"></div>
-                </div>
-            </div>
-
-            <div class="info">
-                <p>🎂 <strong>Ημ/νία Γέννησης:</strong> {{ profile.Birth_Date|default:"—" }}</p>
-                <p>🕒 <strong>Μέλος από:</strong> {{ user.date_joined|date:"F Y" }}</p>
-            </div>
-
-            <div class="actions">
-                <a href="{% url 'history' %}">📜 Ιστορικό</a>
-                <a href="{% url 'stats' %}">📊 Στατιστικά</a>
-            </div>
-
-        </div>
+      <span class="member-chip">
+        🕒 Μέλος από {{ user.date_joined|date:"d/m/Y" }}
+      </span>
     </div>
+
+    <!-- BODY -->
+    <div class="profile-body">
+
+      <div class="mood-summary">
+        <span class="emoji">
+          {% if current_mood == "happy" %}😊
+          {% elif current_mood == "sad" %}😢
+          {% elif current_mood == "angry" %}😡
+          {% elif current_mood == "anxious" %}😰
+          {% else %}😐{% endif %}
+        </span>
+        <div>
+          <small>Τελευταία διάθεση</small>
+          <strong>{{ current_mood|capfirst }}</strong>
+        </div>
+      </div>
+
+      <div class="achievements">
+        <span class="badge">🏆 Mood Explorer</span>
+      </div>
+
+      <!-- VIEW MODE -->
+      <div id="viewMode">
+        <div class="info-card">
+          🎂 Ημερομηνία Γέννησης:
+          <strong>{{ profile.Birth_Date|default:"—" }}</strong>
+        </div>
+
+        <button class="edit-btn" onclick="enableEdit()">✏️ Επεξεργασία Προφίλ</button>
+      </div>
+
+      <form method="POST" id="editMode" class="edit-form" style="display:none;"
+            onsubmit="showToast('✅ Το προφίλ αποθηκεύτηκε!')">
+        {% csrf_token %}
+        <input type="hidden" name="edit_profile" value="1">
+
+        <label>Όνομα χρήστη</label>
+        <input type="text" name="username" value="{{ user.username }}">
+
+        <label>Email</label>
+        <input type="email" name="email" value="{{ user.email }}">
+
+        <label>Ημερομηνία Γέννησης</label>
+        <input type="date" name="birth_date"
+               value="{{ profile.Birth_Date|date:'Y-m-d' }}">
+
+        <div class="edit-actions">
+          <button type="submit" class="save-btn">💾 Αποθήκευση</button>
+          <button type="button" class="cancel-btn" onclick="cancelEdit()">✖</button>
+        </div>
+      </form>
+
+      <!-- ACTIONS -->
+      <div class="quick-actions">
+        <a href="{% url 'history' %}">📜 Ιστορικό</a>
+        <a href="{% url 'stats' %}">📊 Στατιστικά</a>
+      </div>
+
+    </div>
+  </div>
 </div>
+
+<div id="toast" class="toast"></div>
 
 <style>
 /* ===== LAYOUT ===== */
 .profile-wrapper{
-    display:flex;
-    justify-content:center;
-    padding:40px 0;
+  display:flex;
+  justify-content:center;
+  padding:60px 0;
 }
 
 .profile-card{
-    width:380px;
-    background:white;
-    border-radius:26px;
-    overflow:hidden;
-    box-shadow:0 15px 40px rgba(0,0,0,0.2);
-    transition:0.3s;
-    font-family:Segoe UI, sans-serif;
+  width:400px;
+  background:#fff;
+  border-radius:30px;
+  box-shadow:0 30px 70px rgba(0,0,0,0.18);
+  overflow:hidden;
+  animation:fadeUp .6s ease;
+  font-family:Segoe UI,sans-serif;
 }
 
-/* ===== HEADER ===== */
 .profile-header{
-    background:linear-gradient(135deg,#7b3b65,#9e4e79);
-    color:white;
-    text-align:center;
-    padding:35px 20px;
+  text-align:center;
+  padding:42px 20px 30px;
+  background:linear-gradient(135deg,#f6e7ef,#fdfbfc);
 }
 
 .avatar-wrapper{
-    position:relative;
-    width:120px;
-    height:120px;
-    margin:0 auto 15px;
+  position:relative;
+  width:130px;
+  height:130px;
+  margin:0 auto 15px;
 }
 
 .avatar{
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    object-fit:cover;
-    border:4px solid white;
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  object-fit:cover;
+  border:5px solid white;
+  box-shadow:0 12px 30px rgba(0,0,0,.25);
 }
 
 .avatar-edit{
-    position:absolute;
-    bottom:5px;
-    right:5px;
-    width:32px;
-    height:32px;
-    background:white;
-    color:#7b3b65;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    cursor:pointer;
-    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  position:absolute;
+  bottom:8px;
+  right:8px;
+  width:36px;
+  height:36px;
+  background:#7b3b65;
+  color:white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
 }
 
-/* ΚΡΥΒΟΥΜΕ ΤΕΛΕΙΩΣ ΤΟ INPUT */
-#upload-image{
-    display:none;
-}
+#upload-image{ display:none; }
 
 .email{
-    font-size:14px;
-    opacity:0.9;
+  font-size:14px;
+  color:#555;
 }
 
-.badges span{
-    display:inline-block;
-    margin:6px 4px;
-    padding:5px 12px;
-    background:rgba(255,255,255,0.25);
-    border-radius:14px;
-    font-size:13px;
+.member-chip{
+  display:inline-block;
+  margin-top:10px;
+  padding:6px 16px;
+  background:#ececec;
+  border-radius:20px;
+  font-size:13px;
 }
 
-/* ===== BODY ===== */
-.profile-body{
-    padding:22px;
+.profile-body{ padding:26px; }
+
+.mood-summary{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:#f4f0f3;
+  padding:16px;
+  border-radius:20px;
+  margin-bottom:16px;
 }
 
-.progress span{
-    font-size:14px;
-    font-weight:600;
+.mood-summary .emoji{ font-size:32px; }
+
+.achievements{
+  display:flex;
+  justify-content:center;
+  margin-bottom:18px;
 }
 
-.bar{
-    height:8px;
-    background:#eee;
-    border-radius:8px;
-    margin-top:6px;
-    overflow:hidden;
+.badge{
+  background:#7b3b65;
+  color:white;
+  padding:7px 16px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:600;
 }
 
-.fill{
-    width:70%;
-    height:100%;
-    background:linear-gradient(135deg,#7b3b65,#9e4e79);
+.info-card{
+  background:#f6f0f3;
+  padding:16px;
+  border-radius:20px;
+  text-align:center;
+  font-weight:600;
 }
 
-.info{
-    margin:18px 0;
-    font-size:14px;
-    color:#444;
+.edit-btn{
+  margin-top:18px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:22px;
+  background:#7b3b65;
+  color:white;
+  font-weight:700;
 }
 
-/* ACTION BUTTONS */
-.actions{
-    display:flex;
-    justify-content:space-between;
+.edit-form label{
+  font-size:13px;
+  margin-top:12px;
+  display:block;
 }
 
-.actions a{
-    flex:1;
-    margin:0 6px;
-    text-align:center;
-    padding:10px;
-    border-radius:16px;
-    background:linear-gradient(135deg,#7b3b65,#9e4e79);
-    color:white;
-    text-decoration:none;
-    font-size:14px;
-    transition:0.3s;
+.edit-form input{
+  width:100%;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid #ccc;
+  margin-top:4px;
 }
 
-.actions a:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 15px rgba(0,0,0,0.25);
+.edit-actions{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
 }
 
-/* ===== DARK MODE ===== */
-body.dark{
-    background:#1e1e1e;
+.save-btn{
+  flex:1;
+  background:#7b3b65;
+  color:white;
+  border:none;
+  padding:12px;
+  border-radius:20px;
 }
 
-body.dark .profile-card{
-    background:#2c2c2c;
-    color:#ddd;
+.cancel-btn{
+  width:48px;
+  background:#ddd;
+  border:none;
+  border-radius:20px;
 }
 
-body.dark .info{
-    color:#ccc;
+.quick-actions{
+  display:flex;
+  gap:12px;
+  margin-top:24px;
 }
 
-body.dark .bar{
-    background:#444;
+.quick-actions a{
+  flex:1;
+  padding:12px;
+  text-align:center;
+  background:#f0f0f0;
+  border-radius:20px;
+  text-decoration:none;
+  font-weight:600;
 }
 
-/* TOGGLE */
-.dark-toggle{
-    position:fixed;
-    top:18px;
-    right:18px;
-    padding:8px 12px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
+.toast{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  background:#7b3b65;
+  color:white;
+  padding:14px 18px;
+  border-radius:18px;
+  opacity:0;
+  transform:translateY(20px);
+  transition:.4s;
+}
+.toast.show{ opacity:1; transform:none; }
+
+@keyframes fadeUp{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:none;}
 }
 </style>
 
 <script>
-function toggleDarkMode(){
-    document.body.classList.toggle("dark");
-    localStorage.setItem("dark", document.body.classList.contains("dark"));
+function enableEdit(){
+  viewMode.style.display="none";
+  editMode.style.display="block";
 }
-
-if(localStorage.getItem("dark") === "true"){
-    document.body.classList.add("dark");
+function cancelEdit(){
+  editMode.style.display="none";
+  viewMode.style.display="block";
+}
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.innerText=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2500);
 }
 </script>
 

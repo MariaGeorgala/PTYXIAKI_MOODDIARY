@@ -1,10 +1,146 @@
 {% extends "diary/base.html" %}
-
 {% block content %}
-<h2>Αποτέλεσμα Ανάλυσης</h2>
 
-<p style="font-size: 24px;">{{ result }}</p>
+<div class="top-bar">
+    <a href="{% url 'profile' %}" class="btn-back">← Προφίλ</a>
+    <a href="{% url 'stats' %}" class="btn-stats">📊 Στατιστικά</a>
+</div>
 
-<a href="{% url 'log_mood' %}" class="btn">Νέα Αξιολόγηση</a>
+<div class="result-wrapper">
+    <div class="result-card fade-in">
+
+        <div class="icon">🧠</div>
+        <h2>Αποτέλεσμα Ανάλυσης</h2>
+
+        <!-- ΣΥΝΑΙΣΘΗΜΑ -->
+        <p class="emotion-text">
+            {{ emotion }}
+        </p>
+
+        <!-- ΕΝΤΑΣΗ -->
+        <div class="result-score-box">
+            <p class="score-label">🔥 Ένταση Συναισθήματος</p>
+
+            <div class="score-bar">
+                <div
+                    class="score-fill {{ score_class }}"
+                    data-score="{{ score_percent|default:0 }}">
+                </div>
+            </div>
+
+            <div class="score-number">
+                {{ score }} / 10
+            </div>
+        </div>
+
+        <a href="{% url 'log_mood' %}" class="btn-primary">
+            --- Νέα Αξιολόγηση
+        </a>
+
+    </div>
+</div>
+
+<style>
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:30px;
+}
+
+.btn-back,.btn-stats{
+    padding:8px 16px;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:600;
+}
+
+.btn-back{background:#eee;color:#333;}
+.btn-stats{background:#6a85ff;color:white;}
+
+.result-wrapper{
+    display:flex;
+    justify-content:center;
+    padding:40px 0;
+}
+
+.result-card{
+    background:white;
+    max-width:520px;
+    width:100%;
+    padding:45px;
+    border-radius:26px;
+    text-align:center;
+    box-shadow:0 18px 45px rgba(0,0,0,0.18);
+}
+
+.icon{font-size:46px;margin-bottom:10px;}
+
+.emotion-text{
+    font-size:28px;
+    font-weight:800;
+    color:#7b3b65;
+    margin-bottom:30px;
+}
+
+/* ΜΠΑΡΑ */
+.score-label{
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.score-bar{
+    height:14px;
+    background:#eee;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.score-fill{
+    height:100%;
+    width:0;
+    transition:width 0.8s ease;
+}
+
+.score-fill.low{background:#2ecc71;}
+.score-fill.medium{background:#f1c40f;}
+.score-fill.high{background:#e67e22;}
+.score-fill.extreme{background:#e74c3c;}
+
+.score-number{
+    margin-top:12px;
+    font-size:20px;
+    font-weight:700;
+}
+
+.btn-primary{
+    display:inline-block;
+    margin-top:30px;
+    padding:14px 30px;
+    border-radius:24px;
+    background:linear-gradient(135deg,#7b3b65,#9e4e79);
+    color:white;
+    text-decoration:none;
+    font-weight:700;
+}
+
+.fade-in{
+    animation:fadeUp .6s ease;
+}
+
+@keyframes fadeUp{
+    from{opacity:0;transform:translateY(25px);}
+    to{opacity:1;transform:translateY(0);}
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const bar = document.querySelector(".score-fill");
+    if (bar) {
+        const score = bar.dataset.score || 0;
+        bar.style.width = score + "%";
+    }
+});
+</script>
 
 {% endblock %}

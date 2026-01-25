@@ -2,41 +2,238 @@
 {% load static %}
 
 {% block content %}
-<h2>Στατιστικά Διάθεσης</h2>
 
-<h3>📌 Μέσος όρος έντασης:</h3>
-<p>
+<!-- SIMPLE PAGE NAVBAR -->
+<div class="page-navbar">
+  <div class="nav-left">
+    <a href="{% url 'profile' %}" class="nav-btn">👤 Προφίλ</a>
+    <a href="{% url 'history' %}" class="nav-btn">📜 Ιστορικό</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="nav-btn dark-btn" onclick="toggleDarkMode()">🌙</button>
+  </div>
+</div>
+
+<div class="stats-wrapper">
+
+  <h2 class="title">📊 Στατιστικά Διάθεσης</h2>
+  <form method="get" class="filter-box">
+    <div>
+      <label>📅 Από</label>
+      <input type="date" name="start_date" value="{{ request.GET.start_date }}">
+    </div>
+    <div>
+      <label>📅 Έως</label>
+      <input type="date" name="end_date" value="{{ request.GET.end_date }}">
+    </div>
+    <button type="submit">Φιλτράρισμα</button>
+  </form>
+
+  <!-- AVERAGE -->
+  <div class="card">
+    <h3> Μέσος Όρος Έντασης</h3>
     {% if avg_score %}
-        <strong>{{ avg_score|floatformat:1 }}</strong> / 10
+      <p class="avg">{{ avg_score|floatformat:1 }} / 10</p>
     {% else %}
-        Δεν υπάρχουν ακόμη δεδομένα.
+      <p class="empty">Δεν υπάρχουν δεδομένα.</p>
     {% endif %}
-</p>
+  </div>
 
-<h3>📊 Συχνότητα συναισθημάτων</h3>
-<ul>
-    {% for item in mood_counts %}
-        <li><strong>{{ item.mood }}</strong>: {{ item.total }} φορές</li>
-    {% empty %}
-        <li>Δεν υπάρχουν ακόμη καταγραφές.</li>
-    {% endfor %}
-</ul>
+  <div class="card">
+    <h3>Συχνότητα Συναισθημάτων</h3>
+    <ul class="mood-list">
+      {% for item in mood_counts %}
+        <li>
+          <span>{{ item.mood }}</span>
+          <span class="count">{{ item.total }}</span>
+        </li>
+      {% empty %}
+        <li class="empty">Δεν υπάρχουν καταγραφές.</li>
+      {% endfor %}
+    </ul>
+  </div>
 
-<h3>📜 Ιστορικό Καταγραφών</h3>
-<table border="1" cellpadding="10">
-    <tr>
+  <!-- HISTORY -->
+  <div class="card">
+    <h3>📜 Ιστορικό Καταγραφών</h3>
+    <table class="history-table">
+      <tr>
         <th>Ημερομηνία</th>
         <th>Συναίσθημα</th>
         <th>Βαθμός</th>
-    </tr>
+      </tr>
 
-    {% for entry in entries %}
-    <tr>
+      {% for entry in entries %}
+      <tr>
         <td>{{ entry.date|date:"d/m/Y H:i" }}</td>
         <td>{{ entry.mood }}</td>
-        <td>{{ entry.score }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        <td>{{ entry.score }}/10</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3" class="empty">Δεν υπάρχουν καταγραφές.</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+</div>
+
+<style>
+/* PAGE NAVBAR */
+.page-navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:white;
+  padding:14px 18px;
+  border-radius:18px;
+  margin:20px auto 30px;
+  max-width:900px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+
+.nav-left,
+.nav-right{
+  display:flex;
+  gap:10px;
+}
+
+.nav-btn{
+  padding:8px 14px;
+  border-radius:14px;
+  background:#f2f2f2;
+  border:none;
+  text-decoration:none;
+  font-weight:600;
+  color:#333;
+  cursor:pointer;
+}
+
+.dark-btn{
+  background:#7b3b65;
+  color:white;
+}
+
+/* LAYOUT */
+.stats-wrapper{
+  max-width:900px;
+  margin:0 auto 40px;
+  font-family:Segoe UI,sans-serif;
+}
+
+.title{
+  font-size:32px;
+  margin-bottom:20px;
+  text-align:center;
+}
+
+/* FILTER */
+.filter-box{
+  display:flex;
+  gap:15px;
+  align-items:end;
+  margin-bottom:25px;
+  flex-wrap:wrap;
+}
+
+.filter-box input{
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.filter-box button{
+  padding:8px 16px;
+  border:none;
+  border-radius:10px;
+  background:#7b3b65;
+  color:white;
+  font-weight:600;
+}
+
+.card{
+  background:white;
+  padding:22px;
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.12);
+  margin-bottom:25px;
+}
+
+.avg{
+  font-size:28px;
+  font-weight:700;
+  color:#7b3b65;
+}
+
+/* MOODS */
+.mood-list{
+  list-style:none;
+  padding:0;
+}
+.mood-list li{
+  display:flex;
+  justify-content:space-between;
+  padding:8px 0;
+}
+.count{
+  background:#7b3b65;
+  color:white;
+  padding:4px 10px;
+  border-radius:12px;
+}
+
+.history-table{
+  width:100%;
+  border-collapse:collapse;
+}
+.history-table th,
+.history-table td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+}
+
+.empty{
+  color:#888;
+  font-style:italic;
+  text-align:center;
+}
+
+/* DARK MODE */
+body.dark{
+  background:#1e1e1e;
+}
+
+body.dark .page-navbar,
+body.dark .card{
+  background:#2c2c2c;
+  color:#ddd;
+}
+
+body.dark .nav-btn{
+  background:#3a3a3a;
+  color:#ddd;
+}
+
+body.dark .dark-btn{
+  background:#9e4e79;
+}
+
+body.dark table{
+  color:#ddd;
+}
+</style>
+
+<script>
+function toggleDarkMode(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark", document.body.classList.contains("dark"));
+}
+
+if(localStorage.getItem("dark")==="true"){
+  document.body.classList.add("dark");
+}
+</script>
 
 {% endblock %}

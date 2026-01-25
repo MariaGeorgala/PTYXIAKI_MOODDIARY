@@ -3,12 +3,14 @@ from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    Birth_Date = models.DateField(blank=True, null=True)
+
     profile_image = models.ImageField(
-        upload_to="profiles/",
+        upload_to="profile_images/",
         blank=True,
         null=True
     )
+
+    Birth_Date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username

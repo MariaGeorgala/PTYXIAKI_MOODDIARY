@@ -6,7 +6,6 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# 🔹 Φόρτωσε τιμές από το .env
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,22 +82,26 @@ TIME_ZONE = "Europe/Athens"
 USE_I18N = True
 USE_TZ = True
 
-# 🔹 static
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
+
+
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# 🔹 media
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Auth
 LOGIN_REDIRECT_URL = "/"
+
 LOGOUT_REDIRECT_URL = "/"
+LOGIN_URL = "/accounts/login/"
+
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# 🔥 OPENAI
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
