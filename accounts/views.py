@@ -7,8 +7,6 @@ from django.views.decorators.cache import never_cache
 from .forms import SignupForm, ProfileForm
 from .models import UserProfile
 
-
-# ---------------- SIGN UP ----------------
 def signup_view(request):
     if request.method == "POST":
         form = SignupForm(request.POST)
@@ -30,8 +28,6 @@ def signup_view(request):
 
     return render(request, "accounts/signup.html", {"form": form})
 
-
-# ---------------- LOGIN ----------------
 @never_cache
 def login_view(request):
     if request.method == "POST":
@@ -58,20 +54,17 @@ def logout_view(request):
     return redirect("login")
 
 
-# ---------------- PROFILE ----------------
 @never_cache
 @login_required
 def profile_view(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
-    # 📸 1️⃣ UPLOAD ΦΩΤΟΓΡΑΦΙΑΣ
     if request.method == "POST" and request.FILES.get("profile_image"):
         profile.profile_image = request.FILES.get("profile_image")
         profile.save()
         messages.success(request, "Η εικόνα προφίλ ενημερώθηκε!")
         return redirect("profile")
 
-    # ✏️ 2️⃣ INLINE EDIT (username, email, Birth_Date)
     if request.method == "POST" and not request.FILES:
         user = request.user
 
@@ -101,6 +94,5 @@ def profile_view(request):
     })
 
 
-# ---------------- FORGOT PASSWORD ----------------
 def forgot_password(request):
     return render(request, "accounts/forgot_password.html")
