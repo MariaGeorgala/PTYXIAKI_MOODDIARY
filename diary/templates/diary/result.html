@@ -1,9 +1,18 @@
 {% extends "diary/base.html" %}
 {% block content %}
 
-<div class="top-bar">
-    <a href="{% url 'profile' %}" class="btn-back">← Προφίλ</a>
-    <a href="{% url 'stats' %}" class="btn-stats">📊 Στατιστικά</a>
+<!-- ===== NAVBAR ===== -->
+<div class="navbar">
+  <div class="nav-left">
+    <a href="{% url 'log_mood' %}">📝 Νέα Καταγραφή</a>
+    <a href="{% url 'history' %}">📜 Ιστορικό</a>
+    <a href="{% url 'stats' %}">📊 Στατιστικά</a>
+  </div>
+
+  <div class="nav-right">
+    <button onclick="toggleDarkMode()">🌙</button>
+    <a href="{% url 'logout' %}">🚪 Αποσύνδεση</a>
+  </div>
 </div>
 
 <div class="result-wrapper">
@@ -12,12 +21,10 @@
         <div class="icon">🧠</div>
         <h2>Αποτέλεσμα Ανάλυσης</h2>
 
-        <!-- ΣΥΝΑΙΣΘΗΜΑ -->
         <p class="emotion-text">
             {{ emotion }}
         </p>
 
-        <!-- ΕΝΤΑΣΗ -->
         <div class="result-score-box">
             <p class="score-label">🔥 Ένταση Συναισθήματος</p>
 
@@ -34,33 +41,50 @@
         </div>
 
         <a href="{% url 'log_mood' %}" class="btn-primary">
-            --- Νέα Αξιολόγηση
+            ➕ Νέα Αξιολόγηση
         </a>
 
     </div>
 </div>
 
 <style>
-.top-bar{
+.navbar{
+    position:sticky;
+    top:0;
+    width:100%;
+    height:70px;
+    background:#2b2b2b;
     display:flex;
+    align-items:center;
     justify-content:space-between;
-    margin-bottom:30px;
+    padding:0 30px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    z-index:1000;
 }
 
-.btn-back,.btn-stats{
-    padding:8px 16px;
-    border-radius:14px;
+.navbar a{
+    color:white;
     text-decoration:none;
+    font-weight:700;
+    margin-right:15px;
+}
+
+.nav-right button,
+.nav-right a{
+    background:transparent;
+    border:1px solid #ccc;
+    color:white;
+    padding:6px 14px;
+    border-radius:14px;
+    cursor:pointer;
+    margin-left:8px;
     font-weight:600;
 }
-
-.btn-back{background:#eee;color:#333;}
-.btn-stats{background:#6a85ff;color:white;}
 
 .result-wrapper{
     display:flex;
     justify-content:center;
-    padding:40px 0;
+    padding:60px 0;
 }
 
 .result-card{
@@ -81,8 +105,6 @@
     color:#7b3b65;
     margin-bottom:30px;
 }
-
-/* ΜΠΑΡΑ */
 .score-label{
     font-weight:600;
     margin-bottom:10px;
@@ -123,6 +145,20 @@
     font-weight:700;
 }
 
+
+body.dark{
+    background:#1e1e1e;
+    color:white;
+}
+
+body.dark .result-card{
+    background:#2c2c2c;
+}
+
+body.dark .navbar{
+    background:#111;
+}
+
 .fade-in{
     animation:fadeUp .6s ease;
 }
@@ -141,6 +177,14 @@ document.addEventListener("DOMContentLoaded", function () {
         bar.style.width = score + "%";
     }
 });
+
+function toggleDarkMode(){
+    document.body.classList.toggle("dark");
+    localStorage.setItem("dark", document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("dark")==="true"){
+    document.body.classList.add("dark");
+}
 </script>
 
 {% endblock %}
